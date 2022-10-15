@@ -1,0 +1,40 @@
+// app global css in SCSS form
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap');
+* {
+  font-family: 'Open Sans', sans-serif;
+}
+
+$color-list: (
+  green-100: #01d167,
+  green-50: #edfff5,
+  green-10: #ddffec,
+  blue-100: #0c365a,
+  blue-50: #edf3ff,
+);
+
+@each $value in $color-list {
+  .text-#{nth($value, 1)} {
+    color: nth($value, 2);
+  }
+
+  .bg-#{nth($value, 1)} {
+    background-color: nth($value, 2);
+  }
+
+  .border-#{nth($value, 1)} {
+    border-color: nth($value, 2);
+  }
+}
+
+$text-weights: (
+  thin: 300,
+  light: 400,
+  regular: 500,
+  medium: 600,
+  semi-bold: 700,
+  bold: 800,
+) !default;
+
+.px-4 {
+  padding-inline: 0.875rem;
+}
