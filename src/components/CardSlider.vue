@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { computed, onMounted, PropType, ref, toRaw, watch } from 'vue';
+import { onMounted, PropType, ref } from 'vue';
 import { KeenSliderPlugin, useKeenSlider } from 'keen-slider/vue';
-import { ICard } from 'src/models/card';
+import { ICard } from 'src/types';
+import { CardState } from 'src/models/constats';
+import AspireLogoFull from '../assets/icons/AspireLogoFull.svg?component';
 
-defineProps({
+const props = defineProps({
   cards: {
     type: Object as PropType<ICard[]>,
   },
 });
 
-const current = ref(1);
+const emits = defineEmits(['card-changed']);
+const current = ref(0);
 const dots = ref();
 
 const MutationPlugin: KeenSliderPlugin = (slider) => {
@@ -35,9 +38,14 @@ const [container, slider] = useKeenSlider(
     initial: current.value,
     slideChanged: (s) => {
       current.value = s.track.details.rel;
+      if (props.cards?.length) {
+        emits('card-changed', props.cards[current.value].cardId);
+      }
     },
-    updated() {
-      console.log('updated');
+    slides: {
+      origin: 'center',
+      perView: 1,
+      spacing: 20,
     },
   },
   [MutationPlugin]
@@ -45,7 +53,7 @@ const [container, slider] = useKeenSlider(
 
 const dotHelper = () => {
   dots.value = slider.value
-    ? [...Array(slider.value.track.details.slides.length).keys()]
+    ? [...Array(slider.value.track.details?.slides?.length).keys()]
     : [];
 };
 
@@ -55,60 +63,70 @@ onMounted(() => {
 </script>
 
 <template>
-  <div ref="container" className="keen-slider">
-    <template v-for="(card, i) in cards" :key="i">
-      <q-card
-        class="bg-green-100 full-width keen-slider__slide"
-        :class="{}"
-        style="height: 200px"
-      >
-        <q-card-section class="">
-          <q-img
-            width="25%"
-            src="/icons/svg/AspireLogoFull.svg"
-            class="q-ml-auto block"
-          />
-        </q-card-section>
-        <q-card-section class="text-white q-py-none q-px-lg q-gutter-y-md">
-          <span class="text-h6 text-weight-bold">
-            {{ card.cardHolderName }}
-          </span>
-          <div class="inline-block q-gutter-x-md items-center justify-start">
-            <span> &#9679; &#9679; &#9679; &#9679; </span>
-            <span> &#9679; &#9679; &#9679; &#9679; </span>
-            <span> &#9679; &#9679; &#9679; &#9679; </span>
-            <span class="text-caption text-weight-semi-bold">
-              {{ card.cardNumber.slice(-4) }}
-            </span>
-          </div>
-          <div class="inline-block text-caption text-weight-bold q-gutter-x-md">
-            <span> Thru: {{ card.expirationDate }} </span>
-            <span>
-              <span> CVV:</span>
-              <span class="text-h6 text-weight-bold">
-                &lowast; &lowast; &lowast;
+  <template v-if="cards?.length">
+    <div ref="container" class="keen-slider" style="height: 200px">
+      <template v-for="(card, i) in cards" :key="i">
+        <q-card
+          class="bg-green-100 keen-slider__slide"
+          :class="{
+            disabled: card.cardState === CardState.FREEZED,
+          }"
+        >
+          <q-card-section class="row">
+            <q-space />
+            <aspire-logo-full></aspire-logo-full>
+          </q-card-section>
+          <q-card-section class="text-white q-py-none q-px-lg q-gutter-y-md">
+            <p class="text-h6 text-weight-bold no-padding no-margin">
+              {{ card.cardHolderName }}
+              <span v-if="card.cardState === CardState.FREEZED">(Freezed)</span>
+            </p>
+            <div class="inline-block q-gutter-x-md items-center justify-start">
+              <span> &#9679; &#9679; &#9679; &#9679; </span>
+              <span> &#9679; &#9679; &#9679; &#9679; </span>
+              <span> &#9679; &#9679; &#9679; &#9679; </span>
+              <span class="text-caption text-weight-semi-bold">
+                {{ card.cardNumber.slice(-4) }}
               </span>
-            </span>
-          </div>
-        </q-card-section>
-        <q-card-section>
-          <q-img
-            width="20%"
-            src="/icons/svg/Visa Logo.svg"
-            class="q-ml-auto block"
-          />
-        </q-card-section>
-      </q-card>
-    </template>
-  </div>
-  <div v-if="slider" class="dots">
-    <button
-      v-for="(_slide, idx) in dots"
-      @click="slider?.moveToIdx(idx)"
-      :class="{ dot: true, active: current === idx }"
-      :key="idx"
-    ></button>
-  </div>
+            </div>
+            <div
+              class="inline-block text-caption text-weight-bold q-gutter-x-md"
+            >
+              <span> Thru: {{ card.expirationDate }} </span>
+              <span>
+                <span> CVV:</span>
+                <span class="text-h6 text-weight-bold">
+                  &lowast; &lowast; &lowast;
+                </span>
+              </span>
+            </div>
+          </q-card-section>
+          <q-card-section>
+            <q-img
+              width="20%"
+              src="/icons/svg/Visa Logo.svg"
+              class="q-ml-auto block"
+            />
+          </q-card-section>
+        </q-card>
+      </template>
+    </div>
+    <div v-if="slider" class="dots">
+      <button
+        v-for="(_slide, idx) in dots"
+        @click="slider?.moveToIdx(idx)"
+        :class="{ dot: true, active: current === idx }"
+        :key="idx"
+      ></button>
+    </div>
+  </template>
+  <template v-else>
+    <q-card class="bg-blue-80" style="height: 215px">
+      <q-card-section class="column fit items-center justify-center">
+        <h5 class="text-weight-medium">No Cards available</h5>
+      </q-card-section>
+    </q-card>
+  </template>
 </template>
 
 <style>
@@ -121,18 +139,21 @@ onMounted(() => {
 }
 .dot {
   border: none;
-  width: 10px;
-  height: 10px;
-  background: #c5c5c5;
+  width: 5px;
+  height: 5px;
+  background: #01d167;
   border-radius: 50%;
   margin: 0 5px;
-  padding: 5px;
+  padding: 4px;
   cursor: pointer;
+  opacity: 0.1;
 }
 .dot:focus {
   outline: none;
 }
 .dot.active {
-  background: #000;
+  padding: 4px 8px;
+  border-radius: 16px;
+  opacity: 1;
 }
 </style>

@@ -1,16 +1,5 @@
-export enum CardState {
-  ACTIVE = 'ACTIVE',
-  FREEZED = 'FREEZED',
-  DELETED = 'DELETED',
-}
-
-export interface ICard {
-  cardId?: number;
-  cardHolderName: string;
-  expirationDate: string;
-  cardNumber: string;
-  cardState?: CardState;
-}
+import { ICard } from 'src/types';
+import { CardState } from './constats';
 
 export default class Card {
   cardId: number;

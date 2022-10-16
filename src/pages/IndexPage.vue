@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { tabs } from 'src/models/constats';
+import { CardState, tabs } from 'src/models/constats';
 import { ref } from 'vue';
-import Card, { ICard, CardState } from '../models/card';
+import Card from '../models/card';
 import QuickActions from 'src/components/QuickActions.vue';
 import UserDetails from 'src/components/UserDetails.vue';
 import CardSlider from 'src/components/CardSlider.vue';
+import AddNewCard from 'src/components/AddNewCard.vue';
+import { watch } from 'vue';
 
 const mockCard = new Card({
   cardId: 999,
@@ -13,35 +15,21 @@ const mockCard = new Card({
   cardNumber: '1234567891121222',
 });
 
-const addedCard = ref<ICard>({
-  cardHolderName: '',
-  expirationDate: '',
-  cardNumber: '',
-  cardState: CardState.ACTIVE,
-});
-
 const currentCard = ref(999);
 
 const cards = ref([mockCard]);
 
 const isModalOpen = ref(false);
 
-const addNewCard = (event: any) => {
-  cards.value.push(new Card(addedCard.value));
-  isModalOpen.value = false;
-  addedCard.value = new Card({
-    cardHolderName: '',
-    cardNumber: '',
-    expirationDate: '',
-  });
-};
+const selectedTab = ref(tabs[1].name);
 
-const selectedTab = ref(tabs[0].name);
+const cancelCardModal = ref(false);
+const confirmDeleteCard = ref(false);
 
 const actionClicked = (actionId: string) => {
   switch (actionId) {
     case 'freezeCard': {
-      cards.value.map((card) => {
+      cards.value = cards.value.map((card) => {
         if (card.cardId === currentCard.value) {
           return {
             ...card,
@@ -52,20 +40,38 @@ const actionClicked = (actionId: string) => {
       });
       break;
     }
-    case 'cancelCard': {
-      cards.value.map((card) => {
+    case 'unfreezeCard': {
+      cards.value = cards.value.map((card) => {
         if (card.cardId === currentCard.value) {
           return {
             ...card,
-            cardState: CardState.DELETED,
+            cardState: CardState.ACTIVE,
           };
         }
         return card;
       });
       break;
     }
+    case 'cancelCard': {
+      cancelCardModal.value = true;
+      if (!confirmDeleteCard.value) {
+        return;
+      }
+      break;
+    }
   }
 };
+
+watch(confirmDeleteCard, (value) => {
+  if (value) {
+    const temp = cards.value.filter(
+      (card) => card.cardId !== currentCard.value
+    );
+    cards.value = temp.length ? [...temp] : [];
+    currentCard.value = temp.length ? temp[0].cardId : -1;
+    confirmDeleteCard.value = false;
+  }
+});
 </script>
 
 <template>
@@ -108,13 +114,13 @@ const actionClicked = (actionId: string) => {
           </div>
         </div>
       </div>
-      <div style="max-width: 300px">
+      <div class="q-mt-md" style="max-width: 300px">
         <q-tabs
           v-model="selectedTab"
           no-caps
           dense
-          class="no-padding"
-          :indicator-color="'yellow'"
+          class="no-padding text-caption"
+          indicator-color="light-blue-3"
         >
           <template v-for="(tab, i) in tabs" :key="i">
             <q-tab :name="tab.name" :label="tab.label" />
@@ -122,7 +128,10 @@ const actionClicked = (actionId: string) => {
         </q-tabs>
       </div>
       <div class="q-mt-lg">
-        <card-slider :cards="cards"></card-slider>
+        <card-slider
+          :cards="cards"
+          @card-changed="(val) => (currentCard = val)"
+        ></card-slider>
       </div>
     </div>
 
@@ -131,7 +140,7 @@ const actionClicked = (actionId: string) => {
       class="rounded-borders no-shadow"
       style="z-index: 2; top: 64vh; min-height: 40vh; border-radius: 20px"
     >
-      <q-card-section class="q-pa-xs">
+      <q-card-section class="q-pa-xs bg-blue-50">
         <quick-actions
           :current-card="cards.filter((card) => card.cardId)[0]"
           @click="actionClicked"
@@ -139,43 +148,41 @@ const actionClicked = (actionId: string) => {
       </q-card-section>
       <q-card-section style="padding-bottom: 75px">
         <user-details />
-        <q-dialog
-          v-model="isModalOpen"
-          transition-show="flip-down"
-          transition-hide="flip-up"
-        >
-          <q-card class="bg-blue-50 text-white">
-            <q-card-section class="row items-center q-pb-none">
-              <q-space />
-              <q-btn icon="close" flat round dense v-close-popup />
-            </q-card-section>
-            <q-card-section>
-              <div class="text-h6">Card Details</div>
-            </q-card-section>
-
-            <q-card-section class="q-pt-none q-gutter-y-md">
-              <q-input
-                outlined
-                v-model="addedCard.cardHolderName"
-                label="Card Holder Name"
-              />
-              <q-input
-                outlined
-                v-model="addedCard.cardNumber"
-                label="Card Number"
-              />
-              <q-input
-                outlined
-                v-model="addedCard.expirationDate"
-                label="Expiration Number"
-              />
-              <q-btn color="primary" label="Add New Card" @click="addNewCard" />
-            </q-card-section>
-          </q-card>
+        <q-dialog full-width v-model="isModalOpen">
+          <add-new-card
+            @close-model="isModalOpen = false"
+            @add-card="(val) => cards.push(val)"
+          ></add-new-card>
         </q-dialog>
       </q-card-section>
     </q-card>
   </q-page>
+  <q-dialog v-model="cancelCardModal" persistent position="bottom">
+    <q-card>
+      <q-card-section class="row items-center">
+        <span class="q-mx-auto text-body1">
+          Are you sure you want to delete this card?
+        </span>
+      </q-card-section>
+
+      <q-card-actions align="center">
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="confirmDeleteCard = false"
+          v-close-popup
+        />
+        <q-btn
+          flat
+          label="Delete"
+          color="red"
+          @click="confirmDeleteCard = true"
+          v-close-popup
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <style scoped lang="scss">

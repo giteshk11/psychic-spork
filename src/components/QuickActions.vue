@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { ICard, CardState } from 'src/models/card';
+import { CardState } from 'src/models/constats';
+import { ICard } from 'src/types';
 import { PropType } from 'vue';
 
 const quickActions = (currentCard: ICard) => [
   {
     label:
-      currentCard.cardState === CardState.FREEZED
+      currentCard?.cardState === CardState.FREEZED
         ? 'Unfreeze Card'
         : 'Freeze Card',
     icon: 'Freeze Card',
-    id: 'freezeCard',
+    id:
+      currentCard?.cardState === CardState.FREEZED
+        ? 'unfreezeCard'
+        : 'freezeCard',
     isDisabled: false,
   },
   {
@@ -34,11 +38,11 @@ const quickActions = (currentCard: ICard) => [
     label: 'Cancel Card',
     icon: 'Deactivate Card',
     id: 'cancelCard',
-    isDisabled: currentCard.cardState === CardState.DELETED,
+    isDisabled: currentCard?.cardState === CardState.DELETED,
   },
 ];
 
-const props = defineProps({
+defineProps({
   currentCard: {
     type: Object as PropType<ICard>,
     required: true,

@@ -1,3 +1,26 @@
+export const menuList = [
+  {
+    icon: 'Logo',
+    label: 'Home',
+  },
+  {
+    icon: 'Pay',
+    label: 'Cards',
+  },
+  {
+    icon: 'Payments',
+    label: 'Payments',
+  },
+  {
+    icon: 'Credit',
+    label: 'Credit',
+  },
+  {
+    icon: 'Account',
+    label: 'Profile',
+  },
+];
+
 export const tabs = [
   {
     name: 'my-debit-cards',
@@ -39,3 +62,9 @@ export const recentTransaction = [
     amount: '150',
   },
 ];
+
+export enum CardState {
+  ACTIVE = 'ACTIVE',
+  FREEZED = 'FREEZED',
+  DELETED = 'DELETED',
+}

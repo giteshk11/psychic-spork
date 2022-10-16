@@ -16,27 +16,21 @@ const selectedItem = ref(props.menuList[1].label);
 </script>
 
 <template>
-  <div class="full-height bg-blue-100 text-white">
-    <q-list class="justify-center q-gutter-y-lg q-px-md">
-      <q-item>
-        <q-img
-          src="~assets/Logo/Logo@3x.png"
-          fit="fill"
-          width="7rem"
-          height="2rem"
-        />
-      </q-item>
-      <q-item class="no-padding q-mt-xs q-mb-xl" style="opacity: 30%">
-        Trusted way of banking for 3,000+ SMEs and startups in Singapore
-      </q-item>
+  <div class="full-width fixed-bottom shadow-up-3 bg-white">
+    <q-list dense class="row no-wrap justify-center q-py-xs">
       <template v-for="(menuItem, index) in menuList" :key="index">
         <q-item
           clickable
+          dense
           :active="menuItem.label === selectedItem"
-          class="row no-padding"
+          class="column items-center q-mx-sm no-padding justify-center q-gutter-y-xs"
           @click="() => (selectedItem = menuItem.label)"
         >
-          <q-item-section avatar class="no-padding">
+          <q-item-section
+            avatar
+            no-wrap
+            class="self-center column no-padding items-center"
+          >
             <component
               :is="getMenuItemIcon(menuItem.icon)"
               :class="[
@@ -44,8 +38,6 @@ const selectedItem = ref(props.menuList[1].label);
                 ,
               ]"
             />
-          </q-item-section>
-          <q-item-section>
             <span
               :class="[
                 menuItem.label === selectedItem ? 'active-label' : 'label',
@@ -62,23 +54,23 @@ const selectedItem = ref(props.menuList[1].label);
 </template>
 
 <style scoped>
-.logo {
-  width: 5rem;
-  height: 2rem;
-}
 .label {
+  font-size: 0.55rem;
   color: #dddddd;
 }
 
 .active-label {
+  font-size: 0.55rem;
   color: #01d167;
 }
 
 .item {
+  stroke: white;
   fill: #dddddd;
 }
 
 .active-item {
+  stroke: white;
   fill: #01d167;
 }
 </style>
