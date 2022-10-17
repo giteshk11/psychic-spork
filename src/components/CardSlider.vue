@@ -3,12 +3,14 @@ import { onMounted, PropType, ref } from 'vue';
 import { KeenSliderPlugin, useKeenSlider } from 'keen-slider/vue';
 import { ICard } from 'src/types';
 import { CardState } from 'src/models/constats';
-import AspireLogoFull from '../assets/icons/AspireLogoFull.svg?component';
+import AspireLogoFull from 'src/assets/icons/AspireLogoFull.svg?component';
+import IconEye from 'src/assets/icons/eye.svg?component';
 
 const props = defineProps({
   cards: {
     type: Object as PropType<ICard[]>,
   },
+  currentCard: Number,
 });
 
 const emits = defineEmits(['card-changed']);
@@ -64,13 +66,24 @@ onMounted(() => {
 
 <template>
   <template v-if="cards?.length">
-    <div ref="container" class="keen-slider" style="height: 200px">
+    <div
+      ref="container"
+      class="keen-slider relative-position"
+      style="height: 245px; padding: 20px 0px"
+    >
       <template v-for="(card, i) in cards" :key="i">
+        <span
+          class="bg-white text-green-100 fixed-top-right absolute-top-right row items-center justify-between show-card-span"
+        >
+          <IconEye />
+          <span class="q-ml-xs text-caption"> Show Card Number </span>
+        </span>
         <q-card
           class="bg-green-100 keen-slider__slide"
           :class="{
             disabled: card.cardState === CardState.FREEZED,
           }"
+          style="border-radius: 0.8rem"
         >
           <q-card-section class="row">
             <q-space />
@@ -104,7 +117,7 @@ onMounted(() => {
           <q-card-section>
             <q-img
               width="20%"
-              src="/icons/svg/Visa Logo.svg"
+              src="src/assets/icons/Visa Logo.svg"
               class="q-ml-auto block"
             />
           </q-card-section>
@@ -133,6 +146,7 @@ onMounted(() => {
 @import url('keen-slider/keen-slider.css');
 
 .dots {
+  margin-top: -1rem;
   display: flex;
   padding: 10px 0;
   justify-content: center;
@@ -155,5 +169,14 @@ onMounted(() => {
   padding: 4px 8px;
   border-radius: 16px;
   opacity: 1;
+}
+
+.show-card-span {
+  z-index: -1;
+  height: 2.5rem;
+  padding-inline: 0.5rem;
+  padding-bottom: 1rem;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 </style>

@@ -1,22 +1,23 @@
 <script setup lang="ts">
 import { recentTransaction } from 'src/models/constats';
+import IconBAF from 'src/assets/icons/business-and-finance.svg?component';
 </script>
 <template>
   <q-list class="q-gutter-y-md">
     <q-expansion-item
-      icon="img:/icons/svg/Group 11889 (1).svg"
+      icon="img:src/assets/icons/Group 11889 (1).svg"
       label="Card Details"
       class="no-padding rounded-borders text-blue-100 text-weight-medium"
       header-class="box-shadow bg-blue-50"
-      expand-icon="img:/icons/svg/down-arrow.svg"
+      expand-icon="img:src/assets/icons/down-arrow.svg"
     >
     </q-expansion-item>
     <q-expansion-item
-      icon="img:/icons/svg/Group 11889.svg"
+      icon="img:src/assets/icons/Group 11889.svg"
       label="Recent Transactions"
       header-class="box-shadow bg-blue-50 text-blue-100 text-weight-medium"
       class="no-padding rounded-borders box-shadown"
-      expand-icon="img:/icons/svg/down-arrow.svg"
+      expand-icon="img:src/assets/icons/down-arrow.svg"
       default-opened
     >
       <q-card class="item">
@@ -25,7 +26,7 @@ import { recentTransaction } from 'src/models/constats';
             <template v-for="(trans, i) in recentTransaction" :key="i">
               <q-item>
                 <q-item-section avatar>
-                  <q-icon :name="`img:/icons/svg/${trans.icon}.svg`" />
+                  <q-icon :name="`img:src/assets/icons/${trans.icon}.svg`" />
                 </q-item-section>
                 <q-item-section class="text-caption">
                   <div class="row items-center justify-between">
@@ -33,7 +34,7 @@ import { recentTransaction } from 'src/models/constats';
                       <span class="text-weight-medium text-body2">
                         {{ trans.name }}
                       </span>
-                      <span class="text-weight-light">
+                      <span class="text-weight-light text-gray-10">
                         {{ trans.date }}
                       </span>
                     </div>
@@ -50,21 +51,26 @@ import { recentTransaction } from 'src/models/constats';
                       </span>
                     </div>
                   </div>
-                  <div>Refund on card</div>
+                  <div class="q-mt-sm">
+                    <span
+                      class="bg-blue-90 rounded-borders inline-row card-icon"
+                    >
+                      <IconBAF style="margin-bottom: 0.04rem; fill: #fff" />
+                    </span>
+                    <span class="text-blue-90"> Refund on card </span>
+                  </div>
                 </q-item-section>
               </q-item>
-              <q-separator inset />
+              <q-separator inset v-if="recentTransaction.length - 1 !== i" />
             </template>
           </q-list>
         </q-card-section>
-        <q-item-section
-          class="bg-green-50 text-white row justify-center items-center border border-green-10"
-        >
-          <span class="q-pa-sm text-green-100">
-            View all card transcations
-          </span>
-        </q-item-section>
       </q-card>
+      <div
+        class="bg-green-50 text-white row justify-center items-center border border-green-10 no-padding"
+      >
+        <span class="q-pa-md text-green-100"> View all card transcations </span>
+      </div>
     </q-expansion-item>
   </q-list>
 </template>
@@ -72,5 +78,10 @@ import { recentTransaction } from 'src/models/constats';
 <style scoped>
 .item {
   border: 1px solid #f0f0f0;
+}
+
+.card-icon {
+  padding: 1px 6.5px;
+  border-radius: 8px;
 }
 </style>

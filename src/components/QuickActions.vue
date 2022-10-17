@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { CardState } from 'src/models/constats';
 import { ICard } from 'src/types';
-import { PropType } from 'vue';
+import { defineAsyncComponent, PropType } from 'vue';
 
 const quickActions = (currentCard: ICard) => [
   {
@@ -48,6 +48,9 @@ defineProps({
     required: true,
   },
 });
+
+const getIcons = (icon: string) =>
+  defineAsyncComponent(() => import(`../assets/icons/${icon}.svg?component`));
 </script>
 
 <template>
@@ -58,7 +61,7 @@ defineProps({
       class="column items-center q-gutter-y-sm"
       @click.stop="$emit('click', action.id)"
     >
-      <q-icon :name="`img:/icons/svg/${action.icon}.svg`" size="md" />
+      <component :is="getIcons(action.icon)" />
       <span class="text-body2 text-center text-wrap">
         {{ action.label }}
       </span>

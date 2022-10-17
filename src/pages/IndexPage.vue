@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { CardState, tabs } from 'src/models/constats';
-import { ref } from 'vue';
-import Card from '../models/card';
+import { ref, toRaw, watch } from 'vue';
+import Card from 'src/models/card';
 import QuickActions from 'src/components/QuickActions.vue';
 import UserDetails from 'src/components/UserDetails.vue';
 import CardSlider from 'src/components/CardSlider.vue';
 import AddNewCard from 'src/components/AddNewCard.vue';
-import { watch } from 'vue';
+import AspireLogo from 'src/assets/icons/AspireLogo.svg?component';
 
 const mockCard = new Card({
   cardId: 999,
@@ -62,6 +62,19 @@ const actionClicked = (actionId: string) => {
   }
 };
 
+const addCard = (val: any) => {
+  cards.value.push(val);
+  currentCard.value = val.cardId;
+  localStorage.setItem('cards', JSON.stringify(toRaw(cards.value)));
+};
+
+const retreiveCards = () => {
+  const temp = localStorage.getItem('cards');
+  if (temp) {
+    cards.value = JSON.parse(temp);
+  }
+};
+
 watch(confirmDeleteCard, (value) => {
   if (value) {
     const temp = cards.value.filter(
@@ -72,20 +85,20 @@ watch(confirmDeleteCard, (value) => {
     confirmDeleteCard.value = false;
   }
 });
+
+watch(cards, () => {
+  localStorage.setItem('cards', JSON.stringify(toRaw(cards.value)));
+});
+
+retreiveCards();
 </script>
 
 <template>
   <q-page class="relative-position bg-blue-100">
     <!-- 1st section -->
-    <div
-      style="z-index: 1; width: 100%; position: fixed"
-      class="q-px-lg q-mt-md text-white"
-    >
+    <div class="q-px-lg q-mt-md text-white wrapper">
       <div class="w-full">
-        <q-icon
-          name="img:/icons/svg/AspireLogo.svg"
-          class="q-ml-auto block header-logo"
-        ></q-icon>
+        <AspireLogo class="q-ml-auto block header-logo"></AspireLogo>
       </div>
       <div class="row justify-between items-center">
         <div class="column full-width">
@@ -127,11 +140,12 @@ watch(confirmDeleteCard, (value) => {
           </template>
         </q-tabs>
       </div>
-      <div class="q-mt-lg">
+      <div class="q-mt-md slider-wrapper">
         <card-slider
+          :curren-card="currentCard"
           :cards="cards"
           @card-changed="(val) => (currentCard = val)"
-        ></card-slider>
+        />
       </div>
     </div>
 
@@ -151,7 +165,7 @@ watch(confirmDeleteCard, (value) => {
         <q-dialog full-width v-model="isModalOpen">
           <add-new-card
             @close-model="isModalOpen = false"
-            @add-card="(val) => cards.push(val)"
+            @add-card="addCard"
           ></add-new-card>
         </q-dialog>
       </q-card-section>
@@ -189,5 +203,42 @@ watch(confirmDeleteCard, (value) => {
 .header-logo {
   width: 1.4rem;
   height: 1.3rem;
+}
+
+.wrapper {
+  z-index: 1;
+  width: 100%;
+  position: fixed;
+  height: 40%;
+}
+
+.slider-wrapper {
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+@media only screen and (min-width: 600px) {
+  .slider-wrapper {
+    max-width: 50vw;
+    margin: 0 auto;
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .slider-wrapper {
+    max-width: 30vw;
+    margin: 0 10rem;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .slider-wrapper {
+    max-width: 30vw;
+    margin: 0 20rem;
+  }
 }
 </style>

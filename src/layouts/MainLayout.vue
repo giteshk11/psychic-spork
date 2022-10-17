@@ -8,13 +8,13 @@
       <router-view />
     </q-page-container>
   </q-layout>
-  <div class="mobile-only">
+  <div class="lt-md">
     <BottomMenu :menu-list="menuList" style="z-index: 3; position: fixed" />
   </div>
 </template>
 
 <script setup lang="ts">
 import BottomMenu from 'src/components/BottomMenu.vue';
-import SideMenu from '../components/SideMenu.vue';
+import SideMenu from 'src/components/SideMenu.vue';
 import { menuList } from 'src/models/constats';
 </script>

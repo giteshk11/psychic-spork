@@ -9,9 +9,11 @@ $color-list: (
   green-50: #edfff5,
   green-10: #ddffec,
   blue-100: #0c365a,
+  blue-90: #325baf,
   blue-80: #536dff,
   blue-50: #edf3ff,
   red-100: #e3242b,
+  gray-10: #aaaaaa,
 );
 
 @each $value in $color-list {
