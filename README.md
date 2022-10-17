@@ -6,6 +6,11 @@ A Quasar Project
 
 [https://634d542cbdabef2b3df4fea9--lively-halva-a645b7.netlify.app/](https://634d542cbdabef2b3df4fea9--lively-halva-a645b7.netlify.app/)
 
+## Note:
+
+- Please open in mobile view to get the best experience
+- While switch from desktop to mobile view quasar media queries doesn't work well, so just refresh and it will fix the UI
+
 ## Overview
 
 Created UI based on the sample design provided with the task. Using Quasar as the framework/css for building the UI
